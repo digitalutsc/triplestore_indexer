@@ -106,7 +106,15 @@ jobs:
 
       - name: Test scripts
         run: $SCRIPT_DIR/travis_scripts.sh
+        
+      - name: Install drupal-check
+        run: composer global require mglaman/drupal-check
 
+      - name: Run drupal-check
+        continue-on-error: true
+        run: |
+          drupal-check --drupal-root $DRUPAL_DIR $DRUPAL_DIR/web/modules/contrib/triplestore_indexer
+      
       - name: PHPUNIT tests
         run: |
           cd $DRUPAL_DIR/web/core
