@@ -43,14 +43,14 @@ function triplestore_indexer_theme() {
  * Implements hook_entity_insert().
  */
 function triplestore_indexer_entity_insert(EntityInterface $entity) {
-  drupal_register_shutdown_function('executeIndexingAction', 'index_node_to_triplestore_advancedqueue', $entity);
+  drupal_register_shutdown_function('execute_indexing_action', 'index_node_to_triplestore_advancedqueue', $entity);
 }
 
 /**
  * Implements hook_entity_update().
  */
 function triplestore_indexer_entity_update(EntityInterface $entity) {
-  drupal_register_shutdown_function('executeIndexingAction', 'index_node_to_triplestore_advancedqueue', $entity);
+  drupal_register_shutdown_function('execute_indexing_action', 'index_node_to_triplestore_advancedqueue', $entity);
 }
 
 /**
