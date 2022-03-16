@@ -1,1 +1,9 @@
-triplestore_indexer:
+triplestore_indexer: null
+method-of-auth: '-1'
+client-id: null
+client-secret: null
+admin-username: null
+admin-password: null
+advancedqueue-id: default
+aqj-max-retries: '5'
+aqj-retry_delay: '100'

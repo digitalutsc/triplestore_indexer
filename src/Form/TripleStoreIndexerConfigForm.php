@@ -85,7 +85,7 @@ class TripleStoreIndexerConfigForm extends ConfigFormBase {
       '#markup' => $this->t('None.'),
     ];
 
-    $question_type = ($config->get("method-of-auth") !== NULL && !isset($form_state->getValues()['select-auth-method'])) ? $config->get("method-of-auth") : $form_state->getValues()['select-auth-method'];
+    $question_type = ($config->get("method-of-auth") !== NULL && !($form_state->hasValue('select-auth-method'))) ? $config->get("method-of-auth") : $form_state->getValue('select-auth-method');
 
     if (!empty($question_type) && $question_type !== -1) {
       unset($form['container']['triplestore-server-config']['auth-config']['question']);
@@ -152,7 +152,6 @@ class TripleStoreIndexerConfigForm extends ConfigFormBase {
       '#name' => 'advancedqueue-id',
       '#title' => $this->t('Select a queue:'),
       '#required' => TRUE,
-      '#default_value' => 1,
       '#options' => $queues,
       '#default_value' => ($config->get("advancedqueue-id") !== NULL) ? $config->get("advancedqueue-id") : "default",
     ];
@@ -201,7 +200,7 @@ class TripleStoreIndexerConfigForm extends ConfigFormBase {
       '#type' => 'checkboxes',
       '#title' => t('Select which content type(s) to be indexed:'),
       '#options' => $options_contentypes,
-      '#default_value' => array_keys(array_filter($config->get('content-type-to-index'))),
+      '#default_value' => ($config->get("content-type-to-index") !== NULL) ? array_keys(array_filter($config->get('content-type-to-index'))) : [],
     ];
 
     $form['submit-save-config'] = [

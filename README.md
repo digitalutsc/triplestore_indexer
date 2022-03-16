@@ -36,5 +36,3 @@ This Drupal 8 or 9's module provide a system to get the Json-LD representation (
   - **When to index**: During ONLY selected event(s), the indexing will be executed.
   - **Content type**: For ONLY selected content type(s), the indexing will be executed.
   - **Taxonomy**: For ONLY selected taxonomy term(s), the indexing will be executed.
-
-    
