@@ -4,7 +4,7 @@
 name: CI
 
 # Controls when the action will run.
-on: [workflow_dispatch]
+on: [workflow_dispatch, push]
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
@@ -16,11 +16,17 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        php-versions: ["7.3", "7.4"]
+        php-versions: ["7.3", "7.4", "8.0", "8.1"]
         test-suite: ["functional"]
         drupal-version: ["9.3.x", "9.4.x-dev"]
         allowed_failure: [false]
         mysql: ["5.7"]
+        include:
+          - php-versions: 8.1
+            drupal-version: 10.0.x-dev
+            test-suite: functional
+            mysql: 5.7
+            experimental: true
 
     name: PHP ${{ matrix.php-versions }} | drupal ${{ matrix.drupal-version }} | mysql ${{ matrix.mysql }} | test-suite ${{ matrix.test-suite }}
 
@@ -81,6 +87,7 @@ jobs:
           key: ${{ runner.os }}-${{ hashFiles('**/composer.lock') }}
 
       - name: Setup Drupal
+        timeout-minutes: 10
         run: |
           mkdir $DRUPAL_DIR
           $SCRIPT_DIR/travis_setup_drupal.sh
