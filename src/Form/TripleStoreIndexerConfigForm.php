@@ -62,7 +62,7 @@ class TripleStoreIndexerConfigForm extends ConfigFormBase {
 
     $form['container']['triplestore-server-config']['select-auth-method'] = [
       '#type' => 'select',
-      '#title' => $this->t('Select method of authentication (if access control is enable):'),
+      '#title' => $this->t('Drupal Authentication (enabled if Access Control with Group is enabled)'),
       '#options' => [
         '-1' => 'None',
         'digest' => 'Basic Authentication',
