@@ -16,11 +16,19 @@ class IndexingService implements TripleStoreIndexingInterface {
     $type = str_replace("_", "/", $payload['type']);
 
     // Make GET request to any content with _format=jsonld.
-    $client = \Drupal::httpClient();
+    $config = \Drupal::config('triplestore_indexer.triplestoreindexerconfig');
     $uri = "$base_url/$type/$nid" . '?_format=jsonld';
-    $request = $client->get($uri);
-    $graph = $request->getBody();
 
+    if ($config->get("method-of-auth") == 'digest') {
+      $headers = [
+          'auth' => [$config->get('admin-username'),base64_decode($config->get('admin-password'))]
+      ];
+      print_log($headers);
+      $request = \Drupal::httpClient()->get($uri, $headers);
+    } else {
+      $request = \Drupal::httpClient()->get($uri);
+    }
+    $graph = $request->getBody();
     return $graph;
   }
 
@@ -81,15 +89,6 @@ class IndexingService implements TripleStoreIndexingInterface {
         'Content-type: application/ld+json',
       ],
     ];
-
-    if ($config->get("method-of-auth") == 'digest') {
-      $opts[CURLOPT_USERPWD] = $config->get('admin-username') . ":" . base64_decode($config->get('admin-password'));
-      $opts[CURLOPT_HTTPAUTH] = CURLAUTH_DIGEST;
-      $opts[CURLOPT_HTTPHEADER] = [
-        'Content-type: application/ld+json',
-        'Authorization: Basic',
-      ];
-    }
     curl_setopt_array($curl, $opts);
 
     $response = curl_exec($curl);

@@ -62,11 +62,10 @@ class TripleStoreIndexerConfigForm extends ConfigFormBase {
 
     $form['container']['triplestore-server-config']['select-auth-method'] = [
       '#type' => 'select',
-      '#title' => $this->t('Select method of authentication:'),
+      '#title' => $this->t('Drupal Authentication (enabled if Access Control with Group is enabled)'),
       '#options' => [
         '-1' => 'None',
-        'digest' => 'Basic/Digest',
-        // 'oauth' => 'OAuth',
+        'digest' => 'Basic Authentication',
       ],
       '#ajax' => [
         'wrapper' => 'questions-fieldset-wrapper',
@@ -112,26 +111,6 @@ class TripleStoreIndexerConfigForm extends ConfigFormBase {
           ];
 
           break;
-
-        case 'oauth':
-          $form['container']['triplestore-server-config']['auth-config']['client-id'] = [
-            '#type' => 'textfield',
-            '#title' => $this
-              ->t('Client ID:'),
-            '#required' => TRUE,
-            '#default_value' => ($config->get("client_id") !== NULL) ? $config->get("client_id") : "",
-            '#description' => $this->t('To reset the Client ID, change Method of authentication to None first.'),
-          ];
-          $form['container']['triplestore-server-config']['auth-config']['client-secret'] = [
-            '#type' => 'textfield',
-            '#title' => $this
-              ->t('Client Secret:'),
-            '#required' => TRUE,
-            '#default_value' => ($config->get("client-secret") !== NULL) ? $config->get("client-secret") : "",
-            '#description' => $this->t('To reset the Client Secret, change Method of authentication to None first.'),
-          ];
-          break;
-
         default:
           $form['container']['triplestore-server-config']['auth-config']['question'] = [
             '#markup' => $this->t('None.'),
@@ -271,14 +250,6 @@ class TripleStoreIndexerConfigForm extends ConfigFormBase {
         $configFactory->set('client-secret', NULL);
 
         break;
-
-      case 'oauth':
-        $configFactory->set('client-id', $form_state->getValues()['client-id']);
-        $configFactory->set('client-secret', $form_state->getValues()['client-secret']);
-        $configFactory->set('admin-username', NULL);
-        $configFactory->set('admin-password', NULL);
-        break;
-
       default:
         $configFactory->set('client-id', NULL);
         $configFactory->set('client-secret', NULL);
