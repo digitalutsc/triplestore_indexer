@@ -163,7 +163,7 @@ function queue_process(EntityInterface $entity, $action) {
   $config = \Drupal::config('triplestore_indexer.settings');
 
   // Fix warning when Config form hasn't been setup.
-  if (!isset($config)) {
+  if (!isset($config) || empty($config->get("advancedqueue_id"))) {
     return;
   }
 
