@@ -57,7 +57,8 @@ function triplestore_indexer_entity_update(EntityInterface $entity) {
  * Implements hook_entity_delete().
  */
 function triplestore_indexer_entity_predelete(EntityInterface $entity) {
-  execute_indexing_action('delete_node_in_triplestore_advancedqueue', $entity);
+  //execute_indexing_action('delete_node_in_triplestore_advancedqueue', $entity);
+  drupal_register_shutdown_function('execute_indexing_action', 'delete_node_in_triplestore_advancedqueue', $entity);
 }
 
 /**
@@ -159,7 +160,7 @@ if (!function_exists('drupal_log')) {
  * Funcation call embedded after hook_insert,hook_update,hook_delete executed.
  */
 function queue_process(EntityInterface $entity, $action) {
-  $config = \Drupal::config('triplestore_indexer.triplestoreindexerconfig');
+  $config = \Drupal::config('triplestore_indexer.settings');
 
   // Fix warning when Config form hasn't been setup.
   if (!isset($config)) {
@@ -167,7 +168,7 @@ function queue_process(EntityInterface $entity, $action) {
   }
 
   // Get condition of which content type will be indexed.
-  $indexedContentTypes = (is_array($config->get('content-type-to-index'))) ? array_keys(array_filter($config->get('content-type-to-index'))) : [];
+  $indexedContentTypes = (is_array($config->get('content_type_to_index'))) ? array_keys(array_filter($config->get('content_type_to_index'))) : [];
 
   switch ($action) {
     case 'insert':
@@ -179,14 +180,14 @@ function queue_process(EntityInterface $entity, $action) {
           'nid' => $entity->id(),
           'type' => $entity->getEntityTypeId(),
           'action' => $action,
-          'max_tries' => $config->get("aqj-max-retries"),
-          'retry_delay' => $config->get("aqj-retry_delay"),
+          'max_tries' => $config->get("aqj_max_retries"),
+          'retry_delay' => $config->get("aqj_retry_delay"),
         ];
 
         // Create a job and add to Advanced Queue.
         $job = Job::create('triplestore_index_job', $payload);
         if ($job instanceof Job) {
-          $q = Queue::load($config->get("advancedqueue-id"));
+          $q = Queue::load($config->get("advancedqueue_id"));
           $q->enqueueJob($job);
         }
       }
@@ -200,8 +201,8 @@ function queue_process(EntityInterface $entity, $action) {
           'nid' => $entity->id(),
           'type' => $entity->getEntityTypeId(),
           'action' => $action,
-          'max_tries' => $config->get("aqj-max-retries"),
-          'retry_delay' => $config->get("aqj-retry_delay"),
+          'max_tries' => $config->get("aqj_max_retries"),
+          'retry_delay' => $config->get("aqj_retry_delay"),
         ];
         $service = \Drupal::service('triplestore_indexer.indexing');
         $others = $service->getOtherConmponentAssocNode($payload);
@@ -213,7 +214,7 @@ function queue_process(EntityInterface $entity, $action) {
 
         $job = Job::create('triplestore_index_job', $payload);
         if ($job instanceof Job) {
-          $q = Queue::load($config->get("advancedqueue-id"));
+          $q = Queue::load($config->get("advancedqueue_id"));
           $q->enqueueJob($job);
         }
       }

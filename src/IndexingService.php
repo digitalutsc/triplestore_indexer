@@ -16,12 +16,12 @@ class IndexingService implements TripleStoreIndexingInterface {
     $type = str_replace("_", "/", $payload['type']);
 
     // Make GET request to any content with _format=jsonld.
-    $config = \Drupal::config('triplestore_indexer.triplestoreindexerconfig');
+    $config = \Drupal::config('triplestore_indexer.settings');
     $uri = "$base_url/$type/$nid" . '?_format=jsonld';
 
-    if ($config->get("method-of-auth") == 'digest') {
+    if ($config->get("method_of_auth") == 'digest') {
       $headers = [
-          'auth' => [$config->get('admin-username'),base64_decode($config->get('admin-password'))]
+          'auth' => [$config->get('admin_username'),base64_decode($config->get('admin_password'))]
       ];
       print_log($headers);
       $request = \Drupal::httpClient()->get($uri, $headers);
@@ -46,8 +46,8 @@ class IndexingService implements TripleStoreIndexingInterface {
     $request = $client->get($uri);
     $graph = ((array) json_decode($request->getBody()))['@graph'];
 
-    $config = \Drupal::config('triplestore_indexer.triplestoreindexerconfig');
-    $indexedContentTypes = array_keys(array_filter($config->get('content-type-to-index')));
+    $config = \Drupal::config('triplestore_indexer.settings');
+    $indexedContentTypes = array_keys(array_filter($config->get('content_type_to_index')));
     $others = [];
     for ($i = 1; $i < count($graph); $i++) {
       $component = (array) $graph[$i];
@@ -70,8 +70,8 @@ class IndexingService implements TripleStoreIndexingInterface {
    * POST request.
    */
   public function post(string $data) {
-    $config = \Drupal::config('triplestore_indexer.triplestoreindexerconfig');
-    $server = $config->get("server-url");
+    $config = \Drupal::config('triplestore_indexer.settings');
+    $server = $config->get("server_url");
     $namespace = $config->get("namespace");
 
     $curl = curl_init();
@@ -136,8 +136,8 @@ class IndexingService implements TripleStoreIndexingInterface {
   public function delete(string $uri) {
     $curl = curl_init();
 
-    $config = \Drupal::config('triplestore_indexer.triplestoreindexerconfig');
-    $server = $config->get("server-url");
+    $config = \Drupal::config('triplestore_indexer.settings');
+    $server = $config->get("server_url");
     $namespace = $config->get("namespace");
 
     $opts = [
@@ -156,8 +156,8 @@ class IndexingService implements TripleStoreIndexingInterface {
       ],
     ];
 
-    if ($config->get("method-of-auth") == 'digest') {
-      $opts[CURLOPT_USERPWD] = $config->get('admin-username') . ":" . base64_decode($config->get('admin-password'));
+    if ($config->get("method_of_auth") == 'digest') {
+      $opts[CURLOPT_USERPWD] = $config->get('admin_username') . ":" . base64_decode($config->get('admin_password'));
       $opts[CURLOPT_HTTPAUTH] = CURLAUTH_DIGEST;
       $opts[CURLOPT_HTTPHEADER] = [
         'Content-type: text/plain',

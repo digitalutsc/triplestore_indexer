@@ -38,6 +38,7 @@ class IndexNodeToTriplestore extends ActionBase {
 
     // Delete previous indexed (if applicable)
     // queue_process($node, '[Update] delete if exist');
+
     // Index the latest version of the node.
     queue_process($node, 'insert');
   }

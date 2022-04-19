@@ -22,8 +22,6 @@ class TriplestoreIndexJob extends JobTypeBase {
   public function process(Job $job) {
     try {
       global $base_url;
-      $status = 0;
-
       $payload = $job->getPayload();
 
       // Set retry config.
@@ -86,6 +84,7 @@ class TriplestoreIndexJob extends JobTypeBase {
       }
     }
     catch (\Exception $e) {
+      print_log($e->getMessage());
       return JobResult::failure($e->getMessage());
     }
   }

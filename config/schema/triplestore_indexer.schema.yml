@@ -1,0 +1,34 @@
+triplestore_indexer.settings:
+  type: config_object
+  label: 'Triplestore Indexer Configurations'
+  mapping:
+    server_url:
+      type: string
+      label: 'Server URL'
+    namespace:
+      type: string
+      label: 'Namespace'
+    method_of_auth:
+      type: string
+      label: 'Method of authentication'
+    aqj_max_retries:
+      type: integer
+      label: 'Number of retries'
+    aqj_retry_delay:
+      type: integer
+      label: 'Retry Delay (in seconds)'
+    admin_username:
+      type: string
+      label: 'Username'
+    admin_password:
+      type: string
+      label: 'Password'
+    advancedqueue_id:
+      type: string
+      label: 'Advanced Queue ID'
+    content_type_to_index:
+      type: sequence
+      label: 'Content types to be indexed'
+      sequence:
+        type: string
+        label: 'Content type'

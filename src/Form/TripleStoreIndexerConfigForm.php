@@ -17,7 +17,7 @@ class TripleStoreIndexerConfigForm extends ConfigFormBase {
    */
   protected function getEditableConfigNames() {
     return [
-      'triplestore_indexer.triplestoreindexerconfig',
+      'triplestore_indexer.settings',
     ];
   }
 
@@ -32,7 +32,7 @@ class TripleStoreIndexerConfigForm extends ConfigFormBase {
    * {@inheritdoc}
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
-    $config = $this->config('triplestore_indexer.triplestoreindexerconfig');
+    $config = $this->config('triplestore_indexer.settings');
 
     $form['container'] = [
       '#type' => 'container',
@@ -43,13 +43,13 @@ class TripleStoreIndexerConfigForm extends ConfigFormBase {
       '#title' => 'General Settings',
       '#open' => TRUE,
     ];
-    $form['container']['triplestore-server-config']['server-url'] = [
+    $form['container']['triplestore-server-config']['server_url'] = [
       '#type' => 'textfield',
-      '#name' => 'server-url',
+      '#name' => 'server_url',
       '#title' => $this
         ->t('Server URL:'),
       '#required' => TRUE,
-      '#default_value' => ($config->get("server-url") !== NULL) ? $config->get("server-url") : "",
+      '#default_value' => ($config->get("server_url") !== NULL) ? $config->get("server_url") : "",
       '#description' => $this->t('eg. http://localhost:8080/bigdata OR http://localhost:8080/blazegraph'),
     ];
     $form['container']['triplestore-server-config']['namespace'] = [
@@ -71,7 +71,7 @@ class TripleStoreIndexerConfigForm extends ConfigFormBase {
         'wrapper' => 'questions-fieldset-wrapper',
         'callback' => '::promptAuthCallback',
       ],
-      '#default_value' => ($config->get("method-of-auth") !== NULL) ? $config->get("method-of-auth") : "",
+      '#default_value' => ($config->get("method_of_auth") !== NULL) ? $config->get("method_of_auth") : "",
     ];
 
     $form['container']['triplestore-server-config']['auth-config'] = [
@@ -84,32 +84,31 @@ class TripleStoreIndexerConfigForm extends ConfigFormBase {
       '#markup' => $this->t('None.'),
     ];
 
-    $question_type = ($config->get("method-of-auth") !== NULL && !isset($form_state->getValues()['select-auth-method'])) ? $config->get("method-of-auth") : $form_state->getValues()['select-auth-method'];
+    $question_type = ($config->get("method_of_auth") !== NULL && !isset($form_state->getValues()['select-auth-method'])) ? $config->get("method_of_auth") : $form_state->getValues()['select-auth-method'];
 
     if (!empty($question_type) && $question_type !== -1) {
       unset($form['container']['triplestore-server-config']['auth-config']['question']);
       switch ($question_type) {
         case 'digest':
-          $form['container']['triplestore-server-config']['auth-config']['admin-username'] = [
+          $form['container']['triplestore-server-config']['auth-config']['admin_username'] = [
             '#type' => 'textfield',
             '#title' => $this
               ->t('Username:'),
             '#required' => TRUE,
-            '#default_value' => ($config->get("admin-username") !== NULL) ? $config->get("admin-username") : "",
+            '#default_value' => ($config->get("admin_username") !== NULL) ? $config->get("admin_username") : "",
           ];
-          $form['container']['triplestore-server-config']['auth-config']['admin-password'] = [
+          $form['container']['triplestore-server-config']['auth-config']['admin_password'] = [
             '#type' => 'password',
             '#title' => $this
               ->t('Password:'),
             '#required' => TRUE,
             '#attributes' => [
-              'value' => ($config->get('admin-password') !== NULL) ?
-              $config->get('admin-password') : "",
-              'readonly' => ($config->get('admin-password') !== NULL) ? 'readonly' : FALSE,
+              'value' => ($config->get('admin_password') !== NULL) ?
+              $config->get('admin_password') : "",
+              'readonly' => ($config->get('admin_password') !== NULL) ? 'readonly' : FALSE,
             ],
             '#description' => $this->t('To reset the password, change Method of authentication to None first.'),
           ];
-
           break;
         default:
           $form['container']['triplestore-server-config']['auth-config']['question'] = [
@@ -125,16 +124,17 @@ class TripleStoreIndexerConfigForm extends ConfigFormBase {
       '#open' => TRUE,
       '#attributes' => ['id' => 'op-fieldset-wrapper'],
     ];
+
     $queues = \Drupal::entityQuery('advancedqueue_queue')->execute();
-    $form['container']['triplestore-server-config']['op-config']['advancedqueue-id'] = [
+    $form['container']['triplestore-server-config']['op-config']['advancedqueue_id'] = [
       '#type' => 'select',
-      '#name' => 'advancedqueue-id',
+      '#name' => 'advancedqueue_id',
       '#title' => $this->t('Select a queue:'),
       '#required' => TRUE,
-      '#default_value' => 1,
       '#options' => $queues,
-      '#default_value' => ($config->get("advancedqueue-id") !== NULL) ? $config->get("advancedqueue-id") : "default",
+      '#default_value' => ($config->get("advancedqueue_id") !== NULL) ? $config->get("advancedqueue_id") : "default",
     ];
+
     $form['container']['triplestore-server-config']['op-config']['link-to-add-queue'] = [
       '#markup' => $this->t('To create a new queue, <a href="/admin/config/system/queues/add" target="_blank">Click here</a>'),
     ];
@@ -144,7 +144,7 @@ class TripleStoreIndexerConfigForm extends ConfigFormBase {
       '#title' => $this
         ->t('Number of retries:'),
       '#description' => $this->t("If a job is failed to run, set number of retries"),
-      '#default_value' => ($config->get("aqj-max-retries") !== NULL) ? $config->get("aqj-max-retries") : 5,
+      '#default_value' => ($config->get("aqj_max_retries") !== NULL) ? $config->get("aqj_max_retries") : 5,
     ];
 
     $form['container']['triplestore-server-config']['op-config']['retries-delay'] = [
@@ -152,7 +152,7 @@ class TripleStoreIndexerConfigForm extends ConfigFormBase {
       '#title' => $this
         ->t('Retry Delay (in seconds):'),
       '#description' => $this->t("Set the delay time (in seconds) for a job to re-run each time."),
-      '#default_value' => ($config->get("aqj-retry_delay") !== NULL) ? $config->get("aqj-retry_delay") : 100,
+      '#default_value' => ($config->get("aqj_retry_delay") !== NULL) ? $config->get("aqj_retry_delay") : 100,
     ];
 
     $form['configuration'] = [
@@ -180,7 +180,7 @@ class TripleStoreIndexerConfigForm extends ConfigFormBase {
       '#type' => 'checkboxes',
       '#title' => t('Select which content type(s) to be indexed:'),
       '#options' => $options_contentypes,
-      '#default_value' => array_keys(array_filter($config->get('content-type-to-index'))),
+      '#default_value' => (!empty($config->get('content_type_to_index'))) ? array_keys(array_filter($config->get('content_type_to_index'))): 0,
     ];
 
     $form['submit-save-config'] = [
@@ -201,25 +201,23 @@ class TripleStoreIndexerConfigForm extends ConfigFormBase {
     try {
       $client = \Drupal::service('http_client');
       // Get articles from the API.
-      $response = $client->request('GET', $form_state->getValues()['server-url']);
+      $response = $client->request('GET', $form_state->getValues()['server_url']);
 
       if ($response->getStatusCode() !== 200) {
-        $form_state->setErrorByName("server-url",
+        $form_state->setErrorByName("server_url",
           t('Your Server URL is not valid, please check it again.'));
       }
     }
     catch (\Exception $e) {
-      $form_state->setErrorByName("server-url",
+      $form_state->setErrorByName("server_url",
         new FormattableMarkup('Your Server URL is not valid, please check it again. <strong>Error message:</strong> ' . $e->getMessage(), []));
     }
 
-    if ($form_state->getValues()['select-op-method'] !== NULL && $form_state->getValues()['select-op-method'] === 'advanced_queue') {
-      // Validate if entering a valid machine name of queue.
-      $q = Queue::load($form_state->getValues()['advancedqueue-id']);
-      if (!isset($q)) {
-        $form_state->setErrorByName("advancedqueue-id",
-          new FormattableMarkup('This queue\'s machine name "' . $form_state->getValues()['advancedqueue-id'] . '" is not valid, please verify it by <a href="/admin/config/system/queues">clicking here</a>.', []));
-      }
+    // Validate if entering a valid machine name of queue.
+    $q = Queue::load($form_state->getValues()['advancedqueue_id']);
+    if (!isset($q)) {
+      $form_state->setErrorByName("advancedqueue_id",
+        new FormattableMarkup('This queue\'s machine name "' . $form_state->getValues()['advancedqueue_id'] . '" is not valid, please verify it by <a href="/admin/config/system/queues">clicking here</a>.', []));
     }
   }
 
@@ -227,40 +225,30 @@ class TripleStoreIndexerConfigForm extends ConfigFormBase {
    * {@inheritdoc}
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
-    $configFactory = $this->configFactory->getEditable('triplestore_indexer.triplestoreindexerconfig');
+    $configFactory = $this->configFactory->getEditable('triplestore_indexer.settings');
 
-    $configFactory->set('server-url', $form_state->getValues()['server-url'])
+    $configFactory->set('server_url', $form_state->getValues()['server_url'])
       ->set('namespace', $form_state->getValues()['namespace'])
-      ->set('method-of-auth', $form_state->getValues()['select-auth-method'])
-      ->set('method-of-op', "advanced_queue");
+      ->set('method_of_auth', $form_state->getValues()['select-auth-method']);
 
-    $configFactory->set("aqj-max-retries", $form_state->getValues()['number-of-retries']);
-    $configFactory->set("aqj-retry_delay", $form_state->getValues()['retries-delay']);
+    $configFactory->set("aqj_max_retries", $form_state->getValues()['number-of-retries']);
+    $configFactory->set("aqj_retry_delay", $form_state->getValues()['retries-delay']);
 
     switch ($form_state->getValues()['select-auth-method']) {
       case 'digest':
-        $configFactory->set('admin-username', $form_state->getValues()['admin-username']);
-        if ($configFactory->get('admin-password') === NULL) {
-
-          // $service = \Drupal::service('triplestore_indexer.indexing');
-          $configFactory->set('admin-password', base64_encode($form_state->getValues()['admin-password']));
+        $configFactory->set('admin_username', $form_state->getValues()['admin_username']);
+        if ($configFactory->get('admin_password') === NULL) {
+          $configFactory->set('admin_password', base64_encode($form_state->getValues()['admin_password']));
         }
-
-        $configFactory->set('client-id', NULL);
-        $configFactory->set('client-secret', NULL);
-
         break;
       default:
-        $configFactory->set('client-id', NULL);
-        $configFactory->set('client-secret', NULL);
-        $configFactory->set('admin-username', NULL);
-        $configFactory->set('admin-password', NULL);
+        $configFactory->set('admin_username', NULL);
+        $configFactory->set('admin_password', NULL);
         break;
-
     }
 
-    $configFactory->set('advancedqueue-id', $form_state->getValues()['advancedqueue-id']);
-    $configFactory->set('content-type-to-index', $form_state->getValues()['select-content-types']);
+    $configFactory->set('advancedqueue_id', $form_state->getValues()['advancedqueue_id']);
+    $configFactory->set('content_type_to_index', $form_state->getValues()['select-content-types']);
     $configFactory->save();
 
     parent::submitForm($form, $form_state);
@@ -280,5 +268,4 @@ class TripleStoreIndexerConfigForm extends ConfigFormBase {
   public function promptOpCallback(array $form, FormStateInterface $form_state) {
     return $form['container']['triplestore-server-config']['op-config'];
   }
-
 }
