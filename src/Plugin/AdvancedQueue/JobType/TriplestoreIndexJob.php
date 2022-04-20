@@ -70,7 +70,6 @@ class TriplestoreIndexJob extends JobTypeBase {
             }
           }
           break;
-
         default:
           return JobResult::failure("No action assigned.");
 

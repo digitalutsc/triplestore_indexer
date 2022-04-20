@@ -23,7 +23,6 @@ class IndexingService implements TripleStoreIndexingInterface {
       $headers = [
           'auth' => [$config->get('admin_username'),base64_decode($config->get('admin_password'))]
       ];
-      print_log($headers);
       $request = \Drupal::httpClient()->get($uri, $headers);
     } else {
       $request = \Drupal::httpClient()->get($uri);
@@ -41,17 +40,24 @@ class IndexingService implements TripleStoreIndexingInterface {
     $type = str_replace("_", "/", $payload['type']);
 
     // Make GET request to any content with _format=jsonld.
-    $client = \Drupal::httpClient();
     $uri = "$base_url/$type/$nid" . '?_format=jsonld';
-    $request = $client->get($uri);
-    $graph = ((array) json_decode($request->getBody()))['@graph'];
 
+    // add header if there is authentication is needed
     $config = \Drupal::config('triplestore_indexer.settings');
-    $indexedContentTypes = array_keys(array_filter($config->get('content_type_to_index')));
+    if ($config->get("method_of_auth") == 'digest') {
+      $headers = [
+        'auth' => [$config->get('admin_username'),base64_decode($config->get('admin_password'))]
+      ];
+      $request = \Drupal::httpClient()->get($uri, $headers);
+    } else {
+      $request = \Drupal::httpClient()->get($uri);
+    }
+
+    // get response body
+    $graph = ((array) json_decode($request->getBody()))['@graph'];
     $others = [];
     for ($i = 1; $i < count($graph); $i++) {
       $component = (array) $graph[$i];
-
       if (strpos($component['@id'], '/taxonomy/term/') !== FALSE) {
         $vocal = get_vocabulary_from_termid(get_termid_from_uri($component['@id']));
         if (isset($vocal)) {
@@ -62,7 +68,6 @@ class IndexingService implements TripleStoreIndexingInterface {
         array_push($others, $component['@id']);
       }
     }
-
     return $others;
   }
 
@@ -155,15 +160,6 @@ class IndexingService implements TripleStoreIndexingInterface {
         'Content-type: text/plain',
       ],
     ];
-
-    if ($config->get("method_of_auth") == 'digest') {
-      $opts[CURLOPT_USERPWD] = $config->get('admin_username') . ":" . base64_decode($config->get('admin_password'));
-      $opts[CURLOPT_HTTPAUTH] = CURLAUTH_DIGEST;
-      $opts[CURLOPT_HTTPHEADER] = [
-        'Content-type: text/plain',
-        'Authorization: Basic',
-      ];
-    }
     curl_setopt_array($curl, $opts);
 
     $response = curl_exec($curl);

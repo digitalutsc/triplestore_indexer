@@ -57,8 +57,11 @@ function triplestore_indexer_entity_update(EntityInterface $entity) {
  * Implements hook_entity_delete().
  */
 function triplestore_indexer_entity_predelete(EntityInterface $entity) {
-  //execute_indexing_action('delete_node_in_triplestore_advancedqueue', $entity);
-  drupal_register_shutdown_function('execute_indexing_action', 'delete_node_in_triplestore_advancedqueue', $entity);
+  // both failed
+  execute_indexing_action('delete_node_in_triplestore_advancedqueue', $entity);
+
+  // delete content work, but delete indexed content in blazegraph works
+  //drupal_register_shutdown_function('execute_indexing_action', 'delete_node_in_triplestore_advancedqueue', $entity);
 }
 
 /**
