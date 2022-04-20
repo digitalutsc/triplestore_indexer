@@ -7,3 +7,7 @@ dependencies:
   - drupal:jsonld
   - advancedqueue:advancedqueue
   - drupal:restui
+  - drupal:media
+  - drupal:file
+  - drupal:node
+  - drupal:taxonomy
