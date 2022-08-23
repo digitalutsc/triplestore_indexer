@@ -1,7 +1,7 @@
 name: 'TripleStore Indexer'
 type: module
 description: 'This module will listening to Content event and indexing it to RDF and send result to Triple store'
-core_version_requirement: '^8.8 || ^9'
+core_version_requirement: ^8.8 || ^9 || ^10
 package: 'custom'
 dependencies:
   - drupal:jsonld
