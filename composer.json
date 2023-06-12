@@ -32,9 +32,9 @@
         }
     },
     "require": {
-        "islandora/jsonld": "*",
-        "drupal/advancedqueue": "*",
-        "drupal/restui": "*",
+        "islandora/jsonld": "^2.1",
+        "drupal/advancedqueue": "^1.0@RC",
+        "drupal/restui": "^1.21",
         "drupal/console": "*"
     },
     "require-dev": {
