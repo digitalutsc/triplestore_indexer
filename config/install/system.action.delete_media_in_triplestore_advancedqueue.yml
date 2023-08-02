@@ -1,0 +1,9 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - triplestore_indexer
+id: delete_media_in_triplestore_advancedqueue
+label: 'Delete media in Triplestore (via Advanced Queue)'
+type: media
+plugin: delete_media_in_triplestore_advancedqueue
