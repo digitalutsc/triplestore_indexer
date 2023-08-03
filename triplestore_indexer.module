@@ -278,7 +278,7 @@ function queue_process(EntityInterface $entity, $action) {
       break;
   }
 
-  if (is_array($payload) && count($payload) > 0) {
+  if (isset($payload) && is_array($payload) && count($payload) > 0) {
     // Create a job and add to Advanced Queue.
     $job = Job::create('triplestore_index_job', $payload);
     if ($job instanceof Job) {
