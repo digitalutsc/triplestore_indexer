@@ -34,8 +34,7 @@
     "require": {
         "islandora/jsonld": "^2.1",
         "drupal/advancedqueue": "^1.0@RC",
-        "drupal/restui": "^1.21",
-        "drupal/console": "*"
+        "drupal/restui": "^1.21"
     },
     "require-dev": {
         "phpunit/phpunit": "^8",
