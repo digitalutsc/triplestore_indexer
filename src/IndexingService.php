@@ -144,6 +144,8 @@ class IndexingService implements TripleStoreIndexingInterface {
     $config = \Drupal::config('triplestore_indexer.settings');
     $server = $config->get("server_url");
     $namespace = $config->get("namespace");
+    $username = $config->get("admin_username");
+    $password = $config->get("admin_password");
 
     $opts = [
 
@@ -158,12 +160,28 @@ class IndexingService implements TripleStoreIndexingInterface {
       CURLOPT_POSTFIELDS => "",
       CURLOPT_HTTPHEADER => [
         'Content-type: text/plain',
+        'Authorization: Basic ' . base64_encode("$username:$password"),
       ],
     ];
     curl_setopt_array($curl, $opts);
 
     $response = curl_exec($curl);
+
+    // Check for cURL errors
+    if ($response === false) {
+        $error_message = curl_error($curl);
+        curl_close($curl);
+        throw new \Exception("cURL error: $error_message");
+    }
+
+    // Check HTTP status code for errors
+    $http_status_code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
     curl_close($curl);
+
+    if ($http_status_code < 200 || $http_status_code >= 300) {
+        throw new \Exception("HTTP error: $http_status_code");
+    }
+
     return $response;
   }
 

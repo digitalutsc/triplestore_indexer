@@ -52,7 +52,18 @@ class TriplestoreIndexJob extends JobTypeBase {
           $type = str_replace("_", "/", $payload['type']);
 
           $urijld = "<$base_url/$type/$nid" . '?_format=jsonld>';
-          $response = $service->delete($urijld);
+          
+          try {
+            $response = $service->delete($urijld);
+          } catch (\Exception $e) {
+              if ($e->getCode() == 401) {
+                  // Retry with authorization headers if 401 Unauthorized
+                  $response = $service->delete($urijld);
+              } else {
+                  // Handle other exceptions
+                  throw $e;
+              }
+          }
           $result = simplexml_load_string($response);
 
           if ($result['modified'] <= 0) {
