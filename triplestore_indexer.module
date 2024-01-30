@@ -5,12 +5,15 @@
  * Contains triplestore_indexer.module.
  */
 
-use Drupal\taxonomy\Entity\Term;
-use Drupal\Core\Logger\RfcLogLevel;
-use Drupal\Core\Entity\EntityInterface;
-use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\advancedqueue\Entity\Queue;
 use Drupal\advancedqueue\Job;
+use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Logger\RfcLogLevel;
+use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\Core\Url;
+use Drupal\taxonomy\Entity\Term;
+use GuzzleHttp\Exception\ClientException;
 
 /**
  * Implements hook_help().
@@ -47,6 +50,70 @@ function triplestore_indexer_entity_insert(EntityInterface $entity) {
 }
 
 /**
+ * Implements hook_form_alter().
+ */
+function triplestore_indexer_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+  // Matching the form id to node_[content_type]_delete_form.
+  // Adding validator only to the content type that is indexed.
+  if (preg_match('/^node_(.*)_delete_form$/', $form_id, $matches)) {
+    $originalId = $matches[1];
+    $config = \Drupal::config('triplestore_indexer.settings');
+    $indexed_content = $config->get('content_type_to_index');
+    if (is_array($config->get('content_type_to_index')) && in_array($originalId, $indexed_content)) {
+      $form['#validate'][] = 'triplestore_indexer_node_delete_form_validate';
+    }
+  }
+}
+
+/**
+ * Validation handler for node delete forms.
+ */
+function triplestore_indexer_node_delete_form_validate($form, FormStateInterface $form_state) {
+  global $base_url;
+  $node = $form_state->getFormObject()->getEntity();
+  $url = $node->toUrl()->toString();
+  $uri = $base_url . $url . '?_format=jsonld';
+  $config = \Drupal::config('triplestore_indexer.settings');
+  try {
+    switch ($config->get("method_of_auth")) {
+      case 'digest':
+        $headers = [
+          'auth' => [$config->get('admin_username'), base64_decode($config->get('admin_password'))],
+        ];
+        \Drupal::httpClient()->get($uri, $headers);
+        break;
+
+      case 'jwt':
+        $headers = [
+          'Authorization' => 'Bearer ' . $config->get('jwt_token'),
+        ];
+        \Drupal::httpClient()->get($uri, ['headers' => $headers]);
+        break;
+
+      default:
+        \Drupal::httpClient()->get($uri);
+        break;
+    }
+  }
+  catch (Exception $e) {
+    if ($e instanceof ClientException && $e->getCode() > 400 && $e->getCode() < 500) {
+      // Handling 4XX errors.
+      $triplestore_url = Url::fromRoute('triplestore_indexer.triplestore_indexer_config_form')->toString();
+      $form_state->setErrorByName('delete', t('Access Control is in place for this item. <a href="@url">Click here</a> to add authentication to Triplestore Indexer in order to proceed deletion.', ['@url' => $triplestore_url]));
+    }
+    elseif (str_contains($e->getResponse()->getBody()->getContents(), 'getKey()')) {
+      // Handling JWT key missing.
+      $jwt_url = Url::fromRoute('jwt.jwt_config_form')->toString();
+      $form_state->setErrorByName('delete', t('An error occurred: Your JWT Authentication Configurations are invalid! <a href="@url">Click Here</a> to configure them.', ['@url' => $jwt_url]));
+    }
+    else {
+      // General error.
+      $form_state->setErrorByName('delete', t('An error occurred: @error', ['@error' => $e->getMessage()]));
+    }
+  }
+}
+
+/**
  * Implements hook_entity_update().
  */
 function triplestore_indexer_entity_update(EntityInterface $entity) {
@@ -57,11 +124,11 @@ function triplestore_indexer_entity_update(EntityInterface $entity) {
  * Implements hook_entity_delete().
  */
 function triplestore_indexer_entity_predelete(EntityInterface $entity) {
-  // both failed
+  // Both failed.
   execute_indexing_action('delete_node_in_triplestore_advancedqueue', $entity);
 
-  // delete content work, but delete indexed content in blazegraph works
-  //drupal_register_shutdown_function('execute_indexing_action', 'delete_node_in_triplestore_advancedqueue', $entity);
+  // Delete content work, but delete indexed content in blazegraph works.
+  // drupal_register_shutdown_function('execute_indexing_action', 'delete_node_in_triplestore_advancedqueue', $entity);
 }
 
 /**

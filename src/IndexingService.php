@@ -18,14 +18,24 @@ class IndexingService implements TripleStoreIndexingInterface {
     // Make GET request to any content with _format=jsonld.
     $config = \Drupal::config('triplestore_indexer.settings');
     $uri = "$base_url/$type/$nid" . '?_format=jsonld';
+    switch ($config->get("method_of_auth")) {
+      case 'digest':
+        $headers = [
+          'auth' => [$config->get('admin_username'), base64_decode($config->get('admin_password'))],
+        ];
+        $request = \Drupal::httpClient()->get($uri, $headers);
+        break;
 
-    if ($config->get("method_of_auth") == 'digest') {
-      $headers = [
-          'auth' => [$config->get('admin_username'),base64_decode($config->get('admin_password'))]
-      ];
-      $request = \Drupal::httpClient()->get($uri, $headers);
-    } else {
-      $request = \Drupal::httpClient()->get($uri);
+      case 'jwt':
+        $headers = [
+          'Authorization' => 'Bearer ' . $config->get('jwt_token'),
+        ];
+        $request = \Drupal::httpClient()->get($uri, ['headers' => $headers]);
+        break;
+
+      default:
+        $request = \Drupal::httpClient()->get($uri);
+        break;
     }
     $graph = $request->getBody();
     return $graph;
@@ -42,18 +52,30 @@ class IndexingService implements TripleStoreIndexingInterface {
     // Make GET request to any content with _format=jsonld.
     $uri = "$base_url/$type/$nid" . '?_format=jsonld';
 
-    // add header if there is authentication is needed
+    // Add header if there is authentication is needed.
     $config = \Drupal::config('triplestore_indexer.settings');
-    if ($config->get("method_of_auth") == 'digest') {
-      $headers = [
-        'auth' => [$config->get('admin_username'),base64_decode($config->get('admin_password'))]
-      ];
-      $request = \Drupal::httpClient()->get($uri, $headers);
-    } else {
-      $request = \Drupal::httpClient()->get($uri);
+
+    switch ($config->get("method_of_auth")) {
+      case 'digest':
+        $headers = [
+          'auth' => [$config->get('admin_username'), base64_decode($config->get('admin_password'))],
+        ];
+        $request = \Drupal::httpClient()->get($uri, $headers);
+        break;
+
+      case 'jwt':
+        $headers = [
+          'Authorization' => 'Bearer ' . $config->get('jwt_token'),
+        ];
+        $request = \Drupal::httpClient()->get($uri, ['headers' => $headers]);
+        break;
+
+      default:
+        $request = \Drupal::httpClient()->get($uri);
+        break;
     }
 
-    // get response body
+    // Get response body.
     $graph = ((array) json_decode($request->getBody()))['@graph'];
     $others = [];
     for ($i = 1; $i < count($graph); $i++) {
