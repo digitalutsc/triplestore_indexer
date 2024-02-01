@@ -1,0 +1,9 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - triplestore_indexer
+id: index_taxonomy_term_to_triplestore_advancedqueue
+label: 'Index taxonomy term to Triplestore (via Advanced Queue)'
+type: taxonomy_term
+plugin: index_taxonomy_term_to_triplestore_advancedqueue

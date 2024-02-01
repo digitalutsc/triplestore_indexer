@@ -65,6 +65,48 @@ function triplestore_indexer_entity_predelete(EntityInterface $entity) {
 }
 
 /**
+ * Implements hook_taxonomy_term_insert().
+ */
+function triplestore_indexer_taxonomy_term_insert(EntityInterface $term) {
+  drupal_register_shutdown_function('execute_indexing_action', 'index_taxonomy_term_to_triplestore_advancedqueue', $term);
+}
+
+/**
+ * Implements hook_taxonomy_term_update().
+ */
+function triplestore_indexer_taxonomy_term_update(EntityInterface $term) {
+  drupal_register_shutdown_function('execute_indexing_action', 'index_taxonomy_term_to_triplestore_advancedqueue', $term);
+}
+
+/**
+ * Implements hook_taxonomy_term_delete().
+ */
+function triplestore_indexer_taxonomy_term_predelete(EntityInterface $term) {
+  execute_indexing_action('delete_taxonomy_term_in_triplestore_advancedqueue', $term);
+}
+
+/**
+ * Implements hook_media_insert().
+ */
+function triplestore_indexer_media_insert(EntityInterface $media) {
+  drupal_register_shutdown_function('execute_indexing_action', 'index_media_to_triplestore_advancedqueue', $media);
+}
+
+/**
+ * Implements hook_media_update().
+ */
+function triplestore_indexer_media_update(EntityInterface $media) {
+  drupal_register_shutdown_function('execute_indexing_action', 'index_media_to_triplestore_advancedqueue', $media);
+}
+
+/**
+ * Implements hook_media_delete().
+ */
+function triplestore_indexer_media_predelete(EntityInterface $media) {
+  execute_indexing_action('delete_media_in_triplestore_advancedqueue', $media);
+}
+
+/**
  * Execute action with action name.
  */
 function execute_indexing_action(string $actionName, EntityInterface $entity) {
@@ -176,8 +218,7 @@ function queue_process(EntityInterface $entity, $action) {
   switch ($action) {
     case 'insert':
     case 'update':
-      if ($entity->getEntityTypeId() === 'node' && in_array($entity->bundle(), $indexedContentTypes)) {
-
+      if ($entity->getEntityTypeId() === 'node' && in_array($entity->bundle(), $indexedContentTypes) || $entity->getEntityTypeId() === 'taxonomy_term' || $entity->getEntityTypeId() === 'media') {
         // Create a job and add to Advanced Queue.
         $payload = [
           'nid' => $entity->id(),
@@ -186,13 +227,6 @@ function queue_process(EntityInterface $entity, $action) {
           'max_tries' => $config->get("aqj_max_retries"),
           'retry_delay' => $config->get("aqj_retry_delay"),
         ];
-
-        // Create a job and add to Advanced Queue.
-        $job = Job::create('triplestore_index_job', $payload);
-        if ($job instanceof Job) {
-          $q = Queue::load($config->get("advancedqueue_id"));
-          $q->enqueueJob($job);
-        }
       }
       break;
 
@@ -209,22 +243,48 @@ function queue_process(EntityInterface $entity, $action) {
         ];
         $service = \Drupal::service('triplestore_indexer.indexing');
         $others = $service->getOtherConmponentAssocNode($payload);
-
-        // Create a job and add to Advanced Queue.
         if (is_array($others) && count($others) > 0) {
           $payload['others'] = $others;
         }
-
-        $job = Job::create('triplestore_index_job', $payload);
-        if ($job instanceof Job) {
-          $q = Queue::load($config->get("advancedqueue_id"));
-          $q->enqueueJob($job);
+      }
+      else if ($entity->getEntityTypeId() === 'taxonomy_term') {
+        // Get @id of other components associated with term.
+        $payload = [
+          'nid' => $entity->id(),
+          'type' => $entity->getEntityTypeId(),
+          'action' => $action,
+          'max_tries' => $config->get("aqj_max_retries"),
+          'retry_delay' => $config->get("aqj_retry_delay"),
+        ];
+        $service = \Drupal::service('triplestore_indexer.indexing');
+        $others = $service->getOtherComponentAssocTaxonomyTerm($payload);
+        if (is_array($others) && count($others) > 0) {
+          $payload['others'] = $others;
         }
+      }
+      else if ($entity->getEntityTypeId() === 'media') {
+        // Create a job and add to Advanced Queue.
+        $payload = [
+          'nid' => $entity->id(),
+          'type' => $entity->getEntityTypeId(),
+          'action' => $action,
+          'max_tries' => $config->get("aqj_max_retries"),
+          'retry_delay' => $config->get("aqj_retry_delay"),
+        ];
       }
       break;
 
     default:
       break;
+  }
+
+  if (isset($payload) && is_array($payload) && count($payload) > 0) {
+    // Create a job and add to Advanced Queue.
+    $job = Job::create('triplestore_index_job', $payload);
+    if ($job instanceof Job) {
+      $q = Queue::load($config->get("advancedqueue_id"));
+      $q->enqueueJob($job);
+    }
   }
 }
 

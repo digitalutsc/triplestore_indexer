@@ -1,0 +1,9 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - triplestore_indexer
+id: delete_taxonomy_term_in_triplestore_advancedqueue
+label: 'Delete taxonomy term in Triplestore (via Advanced Queue)'
+type: taxonomy_term
+plugin: delete_taxonomy_term_in_triplestore_advancedqueue
