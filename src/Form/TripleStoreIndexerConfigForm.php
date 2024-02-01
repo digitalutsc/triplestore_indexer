@@ -2,10 +2,11 @@
 
 namespace Drupal\triplestore_indexer\Form;
 
+use Drupal\advancedqueue\Entity\Queue;
 use Drupal\Component\Render\FormattableMarkup;
 use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\advancedqueue\Entity\Queue;
+use Drupal\Core\Url;
 
 /**
  * Class TripleStoreIndexerConfigForm definition.
@@ -66,6 +67,7 @@ class TripleStoreIndexerConfigForm extends ConfigFormBase {
       '#options' => [
         '-1' => 'None',
         'digest' => 'Basic Authentication',
+        'jwt' => 'JWT Authentication',
       ],
       '#ajax' => [
         'wrapper' => 'questions-fieldset-wrapper',
@@ -109,6 +111,24 @@ class TripleStoreIndexerConfigForm extends ConfigFormBase {
             '#description' => $this->t('To reset the password, change Method of authentication to None first.'),
           ];
           break;
+
+        case 'jwt':
+          $jwt_key = \Drupal::config('jwt.config')->get('key_id');
+          $key_repository = \Drupal::service('key.repository');
+          $key = $key_repository->getKey($jwt_key);
+          if (\Drupal::hasService('jwt.authentication.jwt') && $key != NULL) {
+            $form['container']['triplestore-server-config']['auth-config']['jwt_available'] = [
+              '#markup' => $this->t('JWT service is available.'),
+            ];
+          }
+          else {
+            $url = Url::fromRoute('jwt.jwt_config_form')->toString();
+            $form['container']['triplestore-server-config']['auth-config']['jwt_error'] = [
+              '#markup' => $this->t('JWT service is not available. Please ensure you have enabled the JWT module and configured the key. <a href="@url">Click here</a> to configure JWT.', ['@url' => $url]),
+            ];
+          }
+          break;
+
         default:
           $form['container']['triplestore-server-config']['auth-config']['question'] = [
             '#markup' => $this->t('None.'),
@@ -218,6 +238,20 @@ class TripleStoreIndexerConfigForm extends ConfigFormBase {
       $form_state->setErrorByName("advancedqueue_id",
         new FormattableMarkup('This queue\'s machine name "' . $form_state->getValues()['advancedqueue_id'] . '" is not valid, please verify it by <a href="/admin/config/system/queues">clicking here</a>.', []));
     }
+
+    // Validate JWT availability.
+    if ($form_state->getValues()['select-auth-method'] === 'jwt') {
+      // Use key_id from jwt module configuration to check if it is available.
+      $jwt_key = \Drupal::config('jwt.config')->get('key_id');
+      $key_repository = \Drupal::service('key.repository');
+      // Check if the key is in key repository.
+      $key = $key_repository->getKey($jwt_key);
+      if (!\Drupal::hasService('jwt.authentication.jwt') || $key == NULL) {
+        $url = Url::fromRoute('jwt.jwt_config_form')->toString();
+        $form_state->setErrorByName("select-auth-method",
+          new FormattableMarkup('JWT service is not available. Please ensure you have enabled the JWT module and configured the key. <a href="@url">Click here</a> to configure JWT.', ['@url' => $url]));
+      }
+    }
   }
 
   /**
@@ -240,9 +274,18 @@ class TripleStoreIndexerConfigForm extends ConfigFormBase {
           $configFactory->set('admin_password', base64_encode($form_state->getValues()['admin_password']));
         }
         break;
+
+      case 'jwt':
+        if (\Drupal::hasService('jwt.authentication.jwt')) {
+          $jwt_token = \Drupal::service('jwt.authentication.jwt')->generateToken();
+          $configFactory->set('jwt_token', $jwt_token);
+        }
+        break;
+
       default:
         $configFactory->set('admin_username', NULL);
         $configFactory->set('admin_password', NULL);
+        $configFactory->set('jwt_token', NULL);
         break;
     }
 
@@ -267,4 +310,5 @@ class TripleStoreIndexerConfigForm extends ConfigFormBase {
   public function promptOpCallback(array $form, FormStateInterface $form_state) {
     return $form['container']['triplestore-server-config']['op-config'];
   }
+
 }
