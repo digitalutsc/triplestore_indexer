@@ -33,6 +33,10 @@ This Drupal 8 or 9's module provide a system to get the Json-LD representation (
   - **Method of operation**:
     + **[Drupal Entity Hooks](https://api.drupal.org/api/drupal/core%21core.api.php/group/hooks/9.0.x)**: By default this option selected, the indexing will be executed immediately after a node or a taxonomy term is [created](https://api.drupal.org/api/drupal/core%21lib%21Drupal%21Core%21Entity%21entity.api.php/function/hook_entity_insert/9.0.x), [update](https://api.drupal.org/api/drupal/core%21lib%21Drupal%21Core%21Entity%21entity.api.php/function/hook_entity_update/9.0.x), or [deleted](https://api.drupal.org/api/drupal/core%21lib%21Drupal%21Core%21Entity%21entity.api.php/function/hook_entity_delete/9.0.x). (*WARNING: it may effect the performance of the site if many nodes/taxonomy terms are being ingested in bulk.*)
     + **[Advanced Queue](https://www.drupal.org/project/advancedqueue)**: Highly Recommended, when a node or a taxonomy term is created, updated, or deleted, the indexing operation will be added to a queue which can be configured to run with Cron job or Drupal Console commnad (eg. drupal advancedqueue:queue:process default). You can create a seperated queue if needed, then enter the new queue's machine name with default in the "Queue" text field below.
-  - **When to index**: During ONLY selected event(s), the indexing will be executed.
-  - **Content type**: For ONLY selected content type(s), the indexing will be executed.
-  - **Taxonomy**: For ONLY selected taxonomy term(s), the indexing will be executed.
+# Enabling Indexing/Deleting
+- To enable indexing/deleting of media, node, or taxonomy term, you must make use of the Context module
+  - Go to `Structure > Context`
+    - Create a Context and choose the Conditions that should be true for the indexing/deleting action to proceed
+    - Under `Reaction` add a Reaction and pick `Triplestore Index Reaction` or `Triplestore Delete Reaction`
+    - In the Action form that shows up for the Reaction, just pick the corresponding one that you would like
+    - Ensure the context is enabled and then save

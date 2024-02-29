@@ -179,29 +179,6 @@ class TripleStoreIndexerConfigForm extends ConfigFormBase {
     ];
     $form['configuration']['#tree'] = TRUE;
 
-    $form['content-type'] = [
-      '#type' => 'details',
-      '#title' => $this
-        ->t('Condition: Node Bundle'),
-      '#group' => 'configuration',
-    ];
-
-    // Pull list of exsiting content types of the site.
-    $content_types = \Drupal::entityTypeManager()
-      ->getStorage('node_type')
-      ->loadMultiple();
-    $options_contentypes = [];
-    foreach ($content_types as $ct) {
-      $options_contentypes[$ct->id()] = $ct->label();
-    }
-
-    $form['content-type']['select-content-types'] = [
-      '#type' => 'checkboxes',
-      '#title' => t('Select which content type(s) to be indexed:'),
-      '#options' => $options_contentypes,
-      '#default_value' => ($config->get("content_type_to_index") !== NULL) ? array_keys(array_filter($config->get('content_type_to_index'))) : [],
-    ];
-
     $form['submit-save-config'] = [
       '#type' => 'submit',
       '#name' => "submit-save-server-config",
@@ -290,7 +267,6 @@ class TripleStoreIndexerConfigForm extends ConfigFormBase {
     }
 
     $configFactory->set('advancedqueue_id', $form_state->getValues()['advancedqueue_id']);
-    $configFactory->set('content_type_to_index', $form_state->getValues()['select-content-types']);
     $configFactory->save();
 
     parent::submitForm($form, $form_state);
