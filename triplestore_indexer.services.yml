@@ -5,3 +5,16 @@ services:
   triplestore_indexer.indexing:
     class: Drupal\triplestore_indexer\IndexingService
     arguments: []
+  triplestore_indexer.context_utils:
+    class: Drupal\triplestore_indexer\TriplestoreContextUtils
+    arguments: ['@entity_type.manager', '@context.repository', '@context.handler', '@entity.form_builder', '@theme.manager', '@current_route_match']
+  triplestore_indexer.taxonomy_term_route_context_provider:
+    class: Drupal\triplestore_indexer\ContextProvider\TermRouteContextProvider
+    arguments: ['@current_route_match']
+    tags:
+      - { name: 'context_provider' }
+  triplestore_indexer.media_route_context_provider:
+    class: Drupal\triplestore_indexer\ContextProvider\MediaRouteContextProvider
+    arguments: ['@current_route_match']
+    tags:
+      - { name: 'context_provider' }
