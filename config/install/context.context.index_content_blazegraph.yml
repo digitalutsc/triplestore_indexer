@@ -1,0 +1,27 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - node
+    - triplestore_indexer
+label: Content
+name: index_content_blazegraph
+group: Indexing
+description: 'Index all content to Blazegraph.'
+requireAllConditions: false
+disabled: false
+conditions:
+  'entity_bundle:node':
+    id: 'entity_bundle:node'
+    negate: false
+    uuid: 03fb40c9-96a7-4142-9296-d72806c4c449
+    context_mapping:
+      node: '@node.node_route_context:node'
+    bundles:
+      islandora_object: islandora_object
+reactions:
+  triplestore_index_reaction:
+    id: triplestore_index_reaction
+    actions: index_node_to_triplestore_advancedqueue
+    saved: false
+weight: 0
