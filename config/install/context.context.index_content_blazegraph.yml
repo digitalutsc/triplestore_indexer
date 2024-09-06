@@ -17,9 +17,7 @@ conditions:
     uuid: 03fb40c9-96a7-4142-9296-d72806c4c449
     context_mapping:
       node: '@node.node_route_context:node'
-    bundles:
-      article: article
-      page: page
+    bundles: {  }
 reactions:
   triplestore_index_reaction:
     id: triplestore_index_reaction
