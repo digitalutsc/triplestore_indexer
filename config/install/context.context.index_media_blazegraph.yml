@@ -2,22 +2,14 @@ langcode: en
 status: true
 dependencies:
   module:
-    - media
     - triplestore_indexer
-label: 'All Media'
+label: Media
 name: index_media_blazegraph
 group: Indexing
 description: 'Index all media bundles Blazegraph'
 requireAllConditions: false
 disabled: false
-conditions:
-  'entity_bundle:media':
-    id: 'entity_bundle:media'
-    negate: false
-    uuid: 0e4b64bb-cf30-442c-b378-e4d501f80f56
-    context_mapping:
-      media: '@triplestore_indexer.media_route_context_provider:media'
-    bundles: {  }
+conditions: {  }
 reactions:
   triplestore_index_reaction:
     id: triplestore_index_reaction
