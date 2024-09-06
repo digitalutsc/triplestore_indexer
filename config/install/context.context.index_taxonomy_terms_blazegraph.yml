@@ -1,0 +1,18 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - triplestore_indexer
+label: 'Taxonomy Terms'
+name: index_taxonomy_terms_blazegraph
+group: Indexing
+description: 'Index taxonomy terms to Blazegraph.'
+requireAllConditions: false
+disabled: false
+conditions: {  }
+reactions:
+  triplestore_index_reaction:
+    id: triplestore_index_reaction
+    actions: index_taxonomy_term_to_triplestore_advancedqueue
+    saved: false
+weight: 0
