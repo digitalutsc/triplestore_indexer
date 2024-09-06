@@ -18,7 +18,8 @@ conditions:
     context_mapping:
       node: '@node.node_route_context:node'
     bundles:
-      islandora_object: islandora_object
+      article: article
+      page: page
 reactions:
   triplestore_index_reaction:
     id: triplestore_index_reaction
