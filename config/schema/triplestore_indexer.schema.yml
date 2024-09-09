@@ -26,9 +26,3 @@ triplestore_indexer.settings:
     advancedqueue_id:
       type: string
       label: 'Advanced Queue ID'
-    content_type_to_index:
-      type: sequence
-      label: 'Content types to be indexed'
-      sequence:
-        type: string
-        label: 'Content type'

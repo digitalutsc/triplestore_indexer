@@ -1,0 +1,18 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - triplestore_indexer
+label: Content
+name: index_content_blazegraph
+group: Indexing
+description: 'Index all content to Blazegraph.'
+requireAllConditions: false
+disabled: false
+conditions: {  }
+reactions:
+  triplestore_index_reaction:
+    id: triplestore_index_reaction
+    actions: index_node_to_triplestore_advancedqueue
+    saved: false
+weight: 0

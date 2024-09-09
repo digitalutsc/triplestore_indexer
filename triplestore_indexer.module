@@ -12,7 +12,10 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Logger\RfcLogLevel;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Url;
+use Drupal\media\MediaInterface;
+use Drupal\node\NodeInterface;
 use Drupal\taxonomy\Entity\Term;
+use Drupal\taxonomy\TermInterface;
 use GuzzleHttp\Exception\ClientException;
 
 /**
@@ -43,13 +46,6 @@ function triplestore_indexer_theme() {
 }
 
 /**
- * Implements hook_entity_insert().
- */
-function triplestore_indexer_entity_insert(EntityInterface $entity) {
-  drupal_register_shutdown_function('execute_indexing_action', 'index_node_to_triplestore_advancedqueue', $entity);
-}
-
-/**
  * Implements hook_form_alter().
  */
 function triplestore_indexer_form_alter(&$form, FormStateInterface $form_state, $form_id) {
@@ -57,9 +53,14 @@ function triplestore_indexer_form_alter(&$form, FormStateInterface $form_state, 
   // Adding validator only to the content type that is indexed.
   if (preg_match('/^node_(.*)_delete_form$/', $form_id, $matches)) {
     $originalId = $matches[1];
-    $config = \Drupal::config('triplestore_indexer.settings');
-    $indexed_content = $config->get('content_type_to_index');
-    if (is_array($config->get('content_type_to_index')) && in_array($originalId, $indexed_content)) {
+    $entity_type_manager = \Drupal::service('entity_type.manager');
+    $content_types_list = $entity_type_manager->getStorage('node_type')->loadMultiple();
+
+    $content_types = [];
+    foreach ($content_types_list as $content_type) {
+      $content_types[] = $content_type->id();
+    }
+    if (in_array($originalId, $content_types)) {
       $form['#validate'][] = 'triplestore_indexer_node_delete_form_validate';
     }
   }
@@ -114,75 +115,75 @@ function triplestore_indexer_node_delete_form_validate($form, FormStateInterface
 }
 
 /**
- * Implements hook_entity_update().
+ * Implements hook_node_insert().
  */
-function triplestore_indexer_entity_update(EntityInterface $entity) {
-  drupal_register_shutdown_function('execute_indexing_action', 'index_node_to_triplestore_advancedqueue', $entity);
+function triplestore_indexer_node_insert(NodeInterface $node) {
+  $utils = \Drupal::service('triplestore_indexer.context_utils');
+  $utils->executeNodeReactions('\Drupal\triplestore_indexer\Plugin\ContextReaction\IndexReaction', $node);
 }
 
 /**
- * Implements hook_entity_delete().
+ * Implements hook_node_update().
  */
-function triplestore_indexer_entity_predelete(EntityInterface $entity) {
-  // Both failed.
-  execute_indexing_action('delete_node_in_triplestore_advancedqueue', $entity);
+function triplestore_indexer_node_update(NodeInterface $node) {
+  $utils = \Drupal::service('triplestore_indexer.context_utils');
+  $utils->executeNodeReactions('\Drupal\triplestore_indexer\Plugin\ContextReaction\IndexReaction', $node);
+}
 
-  // Delete content work, but delete indexed content in blazegraph works.
-  // drupal_register_shutdown_function('execute_indexing_action', 'delete_node_in_triplestore_advancedqueue', $entity);
+/**
+ * Implements hook_node_delete().
+ */
+function triplestore_indexer_node_delete(NodeInterface $node) {
+  $utils = \Drupal::service('triplestore_indexer.context_utils');
+  $utils->executeNodeReactions('\Drupal\triplestore_indexer\Plugin\ContextReaction\DeleteReaction', $node);
 }
 
 /**
  * Implements hook_taxonomy_term_insert().
  */
-function triplestore_indexer_taxonomy_term_insert(EntityInterface $term) {
-  drupal_register_shutdown_function('execute_indexing_action', 'index_taxonomy_term_to_triplestore_advancedqueue', $term);
+function triplestore_indexer_taxonomy_term_insert(TermInterface $term) {
+  $utils = \Drupal::service('triplestore_indexer.context_utils');
+  $utils->executeTermReactions('\Drupal\triplestore_indexer\Plugin\ContextReaction\IndexReaction', $term);
 }
 
 /**
  * Implements hook_taxonomy_term_update().
  */
-function triplestore_indexer_taxonomy_term_update(EntityInterface $term) {
-  drupal_register_shutdown_function('execute_indexing_action', 'index_taxonomy_term_to_triplestore_advancedqueue', $term);
+function triplestore_indexer_taxonomy_term_update(TermInterface $term) {
+  $utils = \Drupal::service('triplestore_indexer.context_utils');
+  $utils->executeTermReactions('\Drupal\triplestore_indexer\Plugin\ContextReaction\IndexReaction', $term);
 }
 
 /**
  * Implements hook_taxonomy_term_delete().
  */
-function triplestore_indexer_taxonomy_term_predelete(EntityInterface $term) {
-  execute_indexing_action('delete_taxonomy_term_in_triplestore_advancedqueue', $term);
+function triplestore_indexer_taxonomy_term_delete(TermInterface $term) {
+  $utils = \Drupal::service('triplestore_indexer.context_utils');
+  $utils->executeTermReactions('\Drupal\triplestore_indexer\Plugin\ContextReaction\DeleteReaction', $term);
 }
 
 /**
  * Implements hook_media_insert().
  */
-function triplestore_indexer_media_insert(EntityInterface $media) {
-  drupal_register_shutdown_function('execute_indexing_action', 'index_media_to_triplestore_advancedqueue', $media);
+function triplestore_indexer_media_insert(MediaInterface $media) {
+  $utils = \Drupal::service('triplestore_indexer.context_utils');
+  $utils->executeMediaReactions('\Drupal\triplestore_indexer\Plugin\ContextReaction\IndexReaction', $media);
 }
 
 /**
  * Implements hook_media_update().
  */
-function triplestore_indexer_media_update(EntityInterface $media) {
-  drupal_register_shutdown_function('execute_indexing_action', 'index_media_to_triplestore_advancedqueue', $media);
+function triplestore_indexer_media_update(MediaInterface $media) {
+  $utils = \Drupal::service('triplestore_indexer.context_utils');
+  $utils->executeMediaReactions('\Drupal\triplestore_indexer\Plugin\ContextReaction\IndexReaction', $media);
 }
 
 /**
  * Implements hook_media_delete().
  */
-function triplestore_indexer_media_predelete(EntityInterface $media) {
-  execute_indexing_action('delete_media_in_triplestore_advancedqueue', $media);
-}
-
-/**
- * Execute action with action name.
- */
-function execute_indexing_action(string $actionName, EntityInterface $entity) {
-  $action = \Drupal::entityTypeManager()
-    ->getStorage('action')
-    ->load($actionName);
-  if ($action) {
-    $action->execute([$entity]);
-  }
+function triplestore_indexer_media_delete(MediaInterface $media) {
+  $utils = \Drupal::service('triplestore_indexer.context_utils');
+  $utils->executeMediaReactions('\Drupal\triplestore_indexer\Plugin\ContextReaction\DeleteReaction', $media);
 }
 
 /**
@@ -279,13 +280,10 @@ function queue_process(EntityInterface $entity, $action) {
     return;
   }
 
-  // Get condition of which content type will be indexed.
-  $indexedContentTypes = (is_array($config->get('content_type_to_index'))) ? array_keys(array_filter($config->get('content_type_to_index'))) : [];
-
   switch ($action) {
     case 'insert':
     case 'update':
-      if ($entity->getEntityTypeId() === 'node' && in_array($entity->bundle(), $indexedContentTypes) || $entity->getEntityTypeId() === 'taxonomy_term' || $entity->getEntityTypeId() === 'media') {
+      if ($entity->getEntityTypeId() === 'node' || $entity->getEntityTypeId() === 'taxonomy_term' || $entity->getEntityTypeId() === 'media') {
         // Create a job and add to Advanced Queue.
         $payload = [
           'nid' => $entity->id(),
@@ -299,7 +297,7 @@ function queue_process(EntityInterface $entity, $action) {
 
     case 'delete':
     case '[Update] delete if exist':
-      if ($entity->getEntityTypeId() === 'node' && in_array($entity->bundle(), $indexedContentTypes)) {
+      if ($entity->getEntityTypeId() === 'node') {
         // Get @id of other components associated with node.
         $payload = [
           'nid' => $entity->id(),

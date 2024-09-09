@@ -1,0 +1,18 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - triplestore_indexer
+label: Media
+name: index_media_blazegraph
+group: Indexing
+description: 'Index all media bundles Blazegraph'
+requireAllConditions: false
+disabled: false
+conditions: {  }
+reactions:
+  triplestore_index_reaction:
+    id: triplestore_index_reaction
+    actions: index_media_to_triplestore_advancedqueue
+    saved: false
+weight: 0
