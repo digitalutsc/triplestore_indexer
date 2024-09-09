@@ -11,3 +11,4 @@ dependencies:
   - drupal:file
   - drupal:node
   - drupal:taxonomy
+  - drupal:context
