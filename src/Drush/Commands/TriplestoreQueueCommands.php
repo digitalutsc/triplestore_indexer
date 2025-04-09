@@ -22,18 +22,17 @@ class TriplestoreQueueCommands extends DrushCommands
      * Deletes media, nodes, or taxonomy terms from a CSV file.
      *
      * @command triplestore-indexer:queue_triplestore
+     * @param mixed $queue_id The machine id of the queue
      * @option  file The path to the CSV file.
      * @usage   triplestore-indexer:queue_triplestore --file=path/to/file.csv
      */
-    public function queueTriplestore($options = ['file' => ''])
+    public function queueTriplestore($queue_id, $options = ['csv' => ''])
     {
-        $file_path = $options['file'];
+        $file_path = $options['csv'];
         if (!file_exists($file_path)) {
             $this->output()->writeln("<error>File not found: $file_path</error>");
             return;
         }
-
-        $triplestore_queue = Queue::load('triplestore');
 
         $handle = fopen($file_path, 'r');
         if ($handle === false) {
@@ -43,6 +42,14 @@ class TriplestoreQueueCommands extends DrushCommands
             );
             return;
       
+        }
+
+        $triplestore_queue = Queue::load($queue_id);
+        if (!$triplestore_queue) {
+            $this->logger()->error(
+                "Unable to load the queue {$queue_id}."
+            );
+            return;
         }
 
         $entity_ids = [];
