@@ -40,3 +40,13 @@ This Drupal 8 or 9's module provide a system to get the Json-LD representation (
     - Under `Reaction` add a Reaction and pick `Triplestore Index Reaction` or `Triplestore Delete Reaction`
     - In the Action form that shows up for the Reaction, just pick the corresponding one that you would like
     - Ensure the context is enabled and then save
+
+# Using Drush Commands
+- To use the drush command to index or delete nodes, media, or taxonomy. Use the command triplestore-indexer:queue_triplestore queueID --csv filepath.csv where filepath.csv is the path to your csv file and queue Id is the machine name of the queue. Inside the csv file:
+  - You have to file the first column with the ID(Node ID, media ID, or term ID based on your request) and the second column handles the request. Note: The first row is skipped and used as a header. The types of request you can make are as follows:
+    - index_node: Indexes the node with node ID to triplestore
+    - delete_node: Deletes the node with node ID from triplestore
+    - index_node: Indexes the media with media ID to triplestore
+    - delete_node: Deletes the media with media ID from triplestore
+    - index_node: Indexes the taxonomy with term ID to triplestore
+    - delete_node: Deletes the taxonomy with term ID from triplestore
