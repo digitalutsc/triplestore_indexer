@@ -194,7 +194,7 @@ class TriplestoreQueueCommands extends DrushCommands
                 }
 
                 $payload = [
-                'tid' => $entity->id(),
+                'nid' => $entity->id(),
                 'term_name' => $entity->getName(),
                 'type' => $entity->getEntityTypeId(),
                 'action' => $request,
