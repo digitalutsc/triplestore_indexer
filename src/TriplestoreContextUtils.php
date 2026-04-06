@@ -14,7 +14,6 @@ use Drupal\taxonomy\TermInterface;
 use Drupal\triplestore_indexer\ContextProvider\MediaContextProvider;
 use Drupal\triplestore_indexer\ContextProvider\NodeContextProvider;
 use Drupal\triplestore_indexer\ContextProvider\TermContextProvider;
-use Drupal\triplestore_indexer\TriplestoreContextManager;
 
 /**
  * Utility functions for firing off context reactions.
@@ -49,7 +48,7 @@ class TriplestoreContextUtils {
     ContextHandlerInterface $contextHandler,
     EntityFormBuilderInterface $entityFormBuilder,
     ThemeManagerInterface $themeManager,
-    RouteMatchInterface $currentRouteMatch
+    RouteMatchInterface $currentRouteMatch,
   ) {
     $this->contextManager = new TriplestoreContextManager(
       $entityTypeManager,

@@ -23,7 +23,7 @@ class DeleteNodeToTriplestore extends ActionBase {
   /**
    * Implements access()
    */
-  public function access($node, AccountInterface $account = NULL, $return_as_object = FALSE) {
+  public function access($node, ?AccountInterface $account = NULL, $return_as_object = FALSE) {
     /** @var \Drupal\node\NodeInterface $node */
     $access = $node->access('delete', $account, TRUE)
       ->andIf($node->title->access('edit', $account, TRUE));
