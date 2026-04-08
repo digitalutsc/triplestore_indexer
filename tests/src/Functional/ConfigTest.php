@@ -38,6 +38,7 @@ class ConfigTest extends BrowserTestBase {
   /**
    * {@inheritdoc}
    */
+  // phpcs:ignore -- Do not disable strict config schema checking in tests.
   protected $strictConfigSchema = FALSE;
 
   /**

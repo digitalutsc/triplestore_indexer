@@ -10,19 +10,21 @@ use Drupal\advancedqueue\Entity\Queue;
 use Drupal\advancedqueue\Job;
 
 /**
- * A Drush command to process media, node, and taxonomy term
- * deletions from a CSV file.
+ * A Drush command.
+ *
+ * To process media, node, and taxonomy term deletions from a CSV file.
  */
 class TriplestoreQueueCommands extends DrushCommands {
 
   /**
    * Deletes media, nodes, or taxonomy terms from a CSV file.
    *
-   * @command triplestore-indexer:queue_triplestore
    * @param mixed $queue_id
    *   The machine id of the queue.
+   * @param array $options
+   *   The path to the CSV file.
    *
-   * @option file The path to the CSV file.
+   * @command triplestore-indexer:queue_triplestore
    *
    * @usage triplestore-indexer:queue_triplestore --file=path/to/file.csv
    */

@@ -1,5 +1,7 @@
 <?php
 
+// phpcs:disable -- Generic.PHP.DeprecatedFunctions.Deprecated
+
 namespace Drupal\triplestore_indexer;
 
 /**

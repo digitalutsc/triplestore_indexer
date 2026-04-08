@@ -5,6 +5,8 @@
  * Contains triplestore_indexer.module.
  */
 
+// phpcs:disable -- Drupal.NamingConventions.ValidFunctionName.InvalidPrefix
+
 use Drupal\advancedqueue\Entity\Queue;
 use Drupal\advancedqueue\Job;
 use Drupal\Core\Entity\EntityInterface;
