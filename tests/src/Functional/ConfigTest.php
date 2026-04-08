@@ -26,7 +26,7 @@ class ConfigTest extends BrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  protected $defaultTheme = 'bartik';
+  protected $defaultTheme = 'stark';
 
   /**
    * A user with permission to administer site configuration.
@@ -67,10 +67,10 @@ class ConfigTest extends BrowserTestBase {
     $config = $this->config('triplestore_indexer.triplestoreindexerconfig');
 
     // Page title field has the default value.
-    $this->assertSession()->fieldExists('server-url');
+    $this->assertSession()->fieldExists('server_url');
     $this->assertSession()->fieldValueEquals(
-      'server-url',
-      $config->get('server-url')
+      'server_url',
+      $config->get('server_url')
     );
 
     // Source text field has the default value.
@@ -83,20 +83,20 @@ class ConfigTest extends BrowserTestBase {
     $this->assertSession()->fieldExists('select-auth-method');
     $this->assertSession()->fieldValueEquals(
       'select-auth-method',
-      $config->get('method-of-auth')
+      $config->get('method_of_auth') ?? '-1'
     );
 
-    if ($config->get("method-of-auth") === "digest") {
-      $this->assertSession()->fieldExists('admin-username');
+    if ($config->get("method_of_auth") === "digest") {
+      $this->assertSession()->fieldExists('admin_username');
       $this->assertSession()->fieldValueEquals(
-        'admin-username',
-        $config->get('admin-password')
+        'admin_username',
+        $config->get('admin_password')
       );
 
-      $this->assertSession()->fieldExists('admin-password');
+      $this->assertSession()->fieldExists('admin_password');
       $this->assertSession()->fieldValueEquals(
-        'admin-password',
-        $config->get('admin-password')
+        'admin_password',
+        $config->get('admin_password')
       );
     }
     elseif ($config->get("method-of-auth") === "oauth") {
@@ -113,22 +113,22 @@ class ConfigTest extends BrowserTestBase {
       );
     }
 
-    $this->assertSession()->fieldExists('advancedqueue-id');
+    $this->assertSession()->fieldExists('advancedqueue_id');
     $this->assertSession()->fieldValueEquals(
-      'advancedqueue-id',
-      $config->get('advancedqueue-id')
+      'advancedqueue_id',
+      $config->get('advancedqueue_id') ?? 'default'
     );
 
     $this->assertSession()->fieldExists('number-of-retries');
     $this->assertSession()->fieldValueEquals(
       'number-of-retries',
-      $config->get('aqj-max-retries')
+      $config->get('aqj_max_retries') ?? 5
     );
 
     $this->assertSession()->fieldExists('retries-delay');
     $this->assertSession()->fieldValueEquals(
       'retries-delay',
-      $config->get('aqj-retry_delay')
+      $config->get('aqj_retry_delay') ?? 100
     );
   }
 

@@ -50,7 +50,7 @@ class LoadTest extends BrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  protected $defaultTheme = 'bartik';
+  protected $defaultTheme = 'stark';
 
   /**
    * {@inheritdoc}
