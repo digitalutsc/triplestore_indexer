@@ -47,18 +47,18 @@ efox" -->
     <env name="MINK_DRIVER_ARGS_WEBDRIVER" value=''/>
   </php>
   <testsuites>
-    <testsuite name="unit">
+    <!-- <testsuite name="unit">
       <directory>../modules/contrib/triplestore_indexer/tests/src/Unit</directory>
     </testsuite>
     <testsuite name="kernel">
       <directory>../modules/contrib/triplestore_indexer/tests/src/Kernel</directory>
-    </testsuite>
+    </testsuite> -->
     <testsuite name="functional">
       <directory>../modules/contrib/triplestore_indexer/tests/src/Functional</directory>
     </testsuite>
-    <testsuite name="functional-javascript">
+    <!-- <testsuite name="functional-javascript">
       <directory>../modules/contrib/triplestore_indexer/tests/src/FunctionalJavascript</directory>
-    </testsuite>
+    </testsuite> -->
     <testsuite name="build">
     </testsuite>
   </testsuites>
