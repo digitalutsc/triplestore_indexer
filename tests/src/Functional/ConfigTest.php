@@ -100,7 +100,7 @@ class ConfigTest extends BrowserTestBase {
         $config->get('admin_password')
       );
     }
-    elseif ($config->get("method-of-auth") === "oauth") {
+    elseif ($config->get("method_of_auth") === "oauth") {
       $this->assertSession()->fieldExists('client-id');
       $this->assertSession()->fieldValueEquals(
         'client-id',
