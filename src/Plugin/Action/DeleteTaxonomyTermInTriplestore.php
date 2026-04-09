@@ -23,7 +23,7 @@ class DeleteTaxonomyTermInTriplestore extends ActionBase {
   /**
    * {@inheritdoc}
    */
-  public function access($term, AccountInterface $account = NULL, $return_as_object = FALSE) {
+  public function access($term, ?AccountInterface $account = NULL, $return_as_object = FALSE) {
     /** @var \Drupal\taxonomy\TermInterface $term */
     $access = $term->access('delete', $account, TRUE)
       ->andIf($term->name->access('edit', $account, TRUE));

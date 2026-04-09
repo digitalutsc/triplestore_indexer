@@ -5,6 +5,8 @@
  * Contains triplestore_indexer.module.
  */
 
+// phpcs:disable -- Drupal.NamingConventions.ValidFunctionName.InvalidPrefix
+
 use Drupal\advancedqueue\Entity\Queue;
 use Drupal\advancedqueue\Job;
 use Drupal\Core\Entity\EntityInterface;
@@ -72,34 +74,33 @@ function triplestore_indexer_form_alter(&$form, FormStateInterface $form_state, 
 function triplestore_indexer_node_delete_form_validate($form, FormStateInterface $form_state) {
   global $base_url;
   $node = $form_state->getFormObject()->getEntity();
-  
+
   $url = $node->toUrl()->toString();
   $uri = $base_url . $url . '?_format=jsonld';
   $config = \Drupal::config('triplestore_indexer.settings');
-  
+
   try {
-    // Use current user's credentials for unpublished nodes
+    // Use current user's credentials for unpublished nodes.
     if (!$node->isPublished()) {
       $current_user = \Drupal::currentUser();
       $username = $current_user->getAccountName();
-      
-      // Since we cannot access the user's actual password for security reasons
 
-      // Throws an error if the password is unable to be retrieved
+      // Since we cannot access the user's actual password for security reasons.
+      // Throws an error if the password is unable to be retrieved.
       if (!$config->get('admin_password')) {
         $form_state->setErrorByName('delete', t('Unable to authenticate for unpublished content deletion. Admin password not configured in triplestore settings.'));
         return;
       }
-      
+
       $password = base64_decode($config->get('admin_password'));
-      
+
       $headers = [
         'auth' => [$username, $password],
       ];
       \Drupal::httpClient()->get($uri, $headers);
     }
     else {
-      // Use configured authentication for published nodes
+      // Use configured authentication for published nodes.
       switch ($config->get("method_of_auth")) {
         case 'digest':
           $headers = [
@@ -337,7 +338,7 @@ function queue_process(EntityInterface $entity, $action) {
           $payload['others'] = $others;
         }
       }
-      else if ($entity->getEntityTypeId() === 'taxonomy_term') {
+      elseif ($entity->getEntityTypeId() === 'taxonomy_term') {
         // Get @id of other components associated with term.
         $payload = [
           'nid' => $entity->id(),
@@ -352,7 +353,7 @@ function queue_process(EntityInterface $entity, $action) {
           $payload['others'] = $others;
         }
       }
-      else if ($entity->getEntityTypeId() === 'media') {
+      elseif ($entity->getEntityTypeId() === 'media') {
         // Create a job and add to Advanced Queue.
         $payload = [
           'nid' => $entity->id(),

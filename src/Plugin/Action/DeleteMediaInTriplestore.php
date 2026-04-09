@@ -23,7 +23,7 @@ class DeleteMediaInTriplestore extends ActionBase {
   /**
    * {@inheritdoc}
    */
-  public function access($media, AccountInterface $account = NULL, $return_as_object = FALSE) {
+  public function access($media, ?AccountInterface $account = NULL, $return_as_object = FALSE) {
     /** @var \Drupal\media\MediaInterface $media */
     $access = $media->access('delete', $account, TRUE)
       ->andIf($media->name->access('edit', $account, TRUE));

@@ -23,7 +23,7 @@ class IndexNodeToTriplestore extends ActionBase {
   /**
    * {@inheritdoc}
    */
-  public function access($node, AccountInterface $account = NULL, $return_as_object = FALSE) {
+  public function access($node, ?AccountInterface $account = NULL, $return_as_object = FALSE) {
     /** @var \Drupal\node\NodeInterface $node */
     $access = $node->access('update', $account, TRUE)
       ->andIf($node->title->access('edit', $account, TRUE));
@@ -37,8 +37,7 @@ class IndexNodeToTriplestore extends ActionBase {
     /** @var \Drupal\node\NodeInterface $node */
 
     // Delete previous indexed (if applicable)
-    // queue_process($node, '[Update] delete if exist');
-
+    // queue_process($node, '[Update] delete if exist');.
     // Index the latest version of the node.
     queue_process($node, 'insert');
   }

@@ -50,11 +50,12 @@ class LoadTest extends BrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  protected $defaultTheme = 'bartik';
+  protected $defaultTheme = 'stark';
 
   /**
    * {@inheritdoc}
    */
+  // phpcs:ignore -- Do not disable strict config schema checking in tests.
   protected $strictConfigSchema = FALSE;
 
   /**

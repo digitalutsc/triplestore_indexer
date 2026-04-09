@@ -45,7 +45,7 @@ class ReactionBase extends ContextReactionPluginBase {
   /**
    * {@inheritdoc}
    */
-  public function execute(EntityInterface $entity = NULL) {
+  public function execute(?EntityInterface $entity = NULL) {
     $config = $this->getConfiguration();
     $entityType = $entity->getEntityTypeId();
     $action_id = $config['actions'];

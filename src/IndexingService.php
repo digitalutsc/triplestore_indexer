@@ -1,5 +1,7 @@
 <?php
 
+// phpcs:disable -- Generic.PHP.DeprecatedFunctions.Deprecated
+
 namespace Drupal\triplestore_indexer;
 
 /**
@@ -111,15 +113,16 @@ class IndexingService implements TripleStoreIndexingInterface {
       $config = \Drupal::config('triplestore_indexer.settings');
       if ($config->get("method_of_auth") == 'digest') {
         $headers = [
-          'auth' => [$config->get('admin_username'), base64_decode($config->get('admin_password'))]
+          'auth' => [$config->get('admin_username'), base64_decode($config->get('admin_password'))],
         ];
         $request = \Drupal::httpClient()->get($uri, $headers);
-      } else {
+      }
+      else {
         $request = \Drupal::httpClient()->get($uri);
       }
 
       // Get response body.
-      $data = json_decode($request->getBody(), true)['@graph'][0];
+      $data = json_decode($request->getBody(), TRUE)['@graph'][0];
 
       // Append the id referenced by the owl:sameAs property.
       $sameAsProperty = $rdf_namespaces['owl'] . 'sameAs';
