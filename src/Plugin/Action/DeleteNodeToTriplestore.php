@@ -37,7 +37,7 @@ class DeleteNodeToTriplestore extends ActionBase {
     /** @var \Drupal\node\NodeInterface $node */
 
     // Delete previous indexed (if applicable)
-    queue_process($node, 'delete');
+    triplestore_indexer_queue_process($node, 'delete');
 
   }
 

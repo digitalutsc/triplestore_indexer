@@ -35,7 +35,7 @@ class DeleteTaxonomyTermInTriplestore extends ActionBase {
    */
   public function execute($term = NULL) {
     /** @var \Drupal\taxonomy\TermInterface $term */
-    queue_process($term, 'delete');
+    triplestore_indexer_queue_process($term, 'delete');
   }
 
 }

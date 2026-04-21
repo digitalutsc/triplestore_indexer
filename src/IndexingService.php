@@ -1,7 +1,5 @@
 <?php
 
-// phpcs:disable -- Generic.PHP.DeprecatedFunctions.Deprecated
-
 namespace Drupal\triplestore_indexer;
 
 /**
@@ -83,7 +81,7 @@ class IndexingService implements TripleStoreIndexingInterface {
     for ($i = 1; $i < count($graph); $i++) {
       $component = (array) $graph[$i];
       if (strpos($component['@id'], '/taxonomy/term/') !== FALSE) {
-        $vocal = get_vocabulary_from_termid(get_termid_from_uri($component['@id']));
+        $vocal = triplestore_indexer_get_vocabulary_from_termid(triplestore_indexer_get_termid_from_uri($component['@id']));
         if (isset($vocal)) {
           array_push($others, $component['@id']);
         }
@@ -161,7 +159,18 @@ class IndexingService implements TripleStoreIndexingInterface {
     curl_setopt_array($curl, $opts);
 
     $response = curl_exec($curl);
-    curl_close($curl);
+    // PHP V8 onwards do not use the curl_close as it has no effect.
+    // If older version, then use curl_close.
+    // Official Docs: https://www.php.net/manual/en/function.curl-close.php.
+    // PHP Watch:
+    // https://php.watch/versions/8.5/curl_close-curl_share_close-deprecated.
+    if (PHP_VERSION_ID >= 80000) {
+      unset($curl);
+    }
+    else {
+      // phpcs:ignore -- Function curl_close() has been deprecated from 8.5.
+      curl_close($curl);
+    }
     return $response;
   }
 
@@ -227,7 +236,18 @@ class IndexingService implements TripleStoreIndexingInterface {
     curl_setopt_array($curl, $opts);
 
     $response = curl_exec($curl);
-    curl_close($curl);
+    // PHP V8 onwards do not use the curl_close as it has no effect.
+    // If older version, then use curl_close.
+    // Official Docs: https://www.php.net/manual/en/function.curl-close.php.
+    // PHP Watch:
+    // https://php.watch/versions/8.5/curl_close-curl_share_close-deprecated.
+    if (PHP_VERSION_ID >= 80000) {
+      unset($curl);
+    }
+    else {
+      // phpcs:ignore -- Function curl_close() has been deprecated from 8.5.
+      curl_close($curl);
+    }
     return $response;
   }
 

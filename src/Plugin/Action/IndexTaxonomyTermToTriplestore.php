@@ -36,7 +36,7 @@ class IndexTaxonomyTermToTriplestore extends ActionBase {
   public function execute($term = NULL) {
     // Index the latest version of the term.
     /** @var \Drupal\taxonomy\TermInterface $term */
-    queue_process($term, 'insert');
+    triplestore_indexer_queue_process($term, 'insert');
   }
 
 }

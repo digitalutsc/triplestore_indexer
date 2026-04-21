@@ -35,7 +35,7 @@ class DeleteMediaInTriplestore extends ActionBase {
    */
   public function execute($media = NULL) {
     /** @var \Drupal\media\MediaInterface $media */
-    queue_process($media, 'delete');
+    triplestore_indexer_queue_process($media, 'delete');
   }
 
 }

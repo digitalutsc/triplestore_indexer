@@ -84,7 +84,7 @@ class TriplestoreIndexJob extends JobTypeBase {
       }
     }
     catch (\Exception $e) {
-      print_log($e->getMessage());
+      error_log(print_r($e->getMessage(), TRUE), 0);
       return JobResult::failure($e->getMessage());
     }
   }

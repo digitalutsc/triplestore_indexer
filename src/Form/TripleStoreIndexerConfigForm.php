@@ -1,7 +1,5 @@
 <?php
 
-// phpcs:disable -- DrupalPractice.Objects.GlobalDrupal.GlobalDrupal
-
 namespace Drupal\triplestore_indexer\Form;
 
 use Drupal\advancedqueue\Entity\Queue;

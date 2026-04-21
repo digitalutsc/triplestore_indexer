@@ -5,13 +5,10 @@
  * Contains triplestore_indexer.module.
  */
 
-// phpcs:disable -- Drupal.NamingConventions.ValidFunctionName.InvalidPrefix
-
 use Drupal\advancedqueue\Entity\Queue;
 use Drupal\advancedqueue\Job;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\Logger\RfcLogLevel;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Url;
 use Drupal\media\MediaInterface;
@@ -213,92 +210,9 @@ function triplestore_indexer_media_delete(MediaInterface $media) {
 }
 
 /**
- * Debug function: display any variable to error log.
- *
- * @param $thing
- */
-if (!function_exists('print_log')) {
-
-  /**
-   * Logging in apache log.
-   */
-  function print_log($thing) {
-    error_log(print_r($thing, TRUE), 0);
-  }
-
-}
-/**
- * Debug function: display any variable to current webpage.
- *
- * @param $thing
- */
-if (!function_exists('logging')) {
-
-  /**
-   * Logging in webpage.
-   */
-  function logging($thing) {
-    echo "<pre>";
-    print_r($thing);
-    echo "</pre>";
-  }
-
-}
-
-/**
- * Debug function: display any variable to drupal Reports Log messages.
- */
-if (!function_exists('drupal_log')) {
-
-  /**
-   * Logging in Recent Log messages.
-   */
-  function drupal_log($msg, $type = "error") {
-    switch ($type) {
-      case "notice":
-        \Drupal::logger(basename(__FILE__, '.module'))->notice($msg);
-        break;
-
-      case "log":
-        \Drupal::logger(basename(__FILE__, '.module'))->log(RfcLogLevel::NOTICE, $msg);
-        break;
-
-      case "warning":
-        \Drupal::logger(basename(__FILE__, '.module'))->warning($msg);
-        break;
-
-      case "alert":
-        \Drupal::logger(basename(__FILE__, '.module'))->alert($msg);
-        break;
-
-      case "critical":
-        \Drupal::logger(basename(__FILE__, '.module'))->critical($msg);
-        break;
-
-      case "debug":
-        \Drupal::logger(basename(__FILE__, '.module'))->debug($msg);
-        break;
-
-      case "info":
-        \Drupal::logger(basename(__FILE__, '.module'))->info($msg);
-        break;
-
-      case "emergency":
-        \Drupal::logger(basename(__FILE__, '.module'))->emergency($msg);
-        break;
-
-      default:
-        \Drupal::logger(basename(__FILE__, '.module'))->error($msg);
-        break;
-    }
-  }
-
-}
-
-/**
  * Funcation call embedded after hook_insert,hook_update,hook_delete executed.
  */
-function queue_process(EntityInterface $entity, $action) {
+function triplestore_indexer_queue_process(EntityInterface $entity, $action) {
   $config = \Drupal::config('triplestore_indexer.settings');
 
   // Fix warning when Config form hasn't been setup.
@@ -382,7 +296,7 @@ function queue_process(EntityInterface $entity, $action) {
 /**
  * Get Term ID out of serialized URI.
  */
-function get_termid_from_uri(string $uri) {
+function triplestore_indexer_get_termid_from_uri(string $uri) {
   global $base_url;
   return str_replace("?_format=jsonld", "", str_replace($base_url . "/taxonomy/term/", "", $uri));
 }
@@ -390,7 +304,7 @@ function get_termid_from_uri(string $uri) {
 /**
  * Get Vocabulary from Term ID.
  */
-function get_vocabulary_from_termid(int $term_id) {
+function triplestore_indexer_get_vocabulary_from_termid(int $term_id) {
   $term = Term::load($term_id);
   return $term->bundle();
 }

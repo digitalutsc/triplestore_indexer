@@ -37,9 +37,9 @@ class IndexNodeToTriplestore extends ActionBase {
     /** @var \Drupal\node\NodeInterface $node */
 
     // Delete previous indexed (if applicable)
-    // queue_process($node, '[Update] delete if exist');.
+    // triplestore_indexer_queue_process($node, '[Update] delete if exist');.
     // Index the latest version of the node.
-    queue_process($node, 'insert');
+    triplestore_indexer_queue_process($node, 'insert');
   }
 
 }

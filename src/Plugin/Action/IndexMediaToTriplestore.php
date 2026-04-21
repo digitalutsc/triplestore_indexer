@@ -36,7 +36,7 @@ class IndexMediaToTriplestore extends ActionBase {
   public function execute($media = NULL) {
     // Index the latest version of the media.
     /** @var \Drupal\media\MediaInterface $media */
-    queue_process($media, 'insert');
+    triplestore_indexer_queue_process($media, 'insert');
   }
 
 }
