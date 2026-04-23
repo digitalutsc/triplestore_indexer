@@ -207,8 +207,15 @@ class TripleStoreIndexerConfigForm extends ConfigFormBase {
       }
     }
     catch (\Exception $e) {
-      $form_state->setErrorByName("server_url",
-        new FormattableMarkup('Your Server URL is not valid, please check it again. <strong>Error message:</strong> ' . $e->getMessage(), []));
+      $errno = method_exists($e, 'getHandlerContext') ? ($e->getHandlerContext()['errno'] ?? 0) : 0;
+      // Allow error code 'cURL error 60: SSL certificate problem: unable to get local issuer certificate'
+      if ($errno === 60) {
+        \Drupal::messenger()->addWarning(t('SSL certificate could not be verified.'));
+      }
+      else {
+        $form_state->setErrorByName("server_url",
+          new FormattableMarkup('Your Server URL is not valid, please check it again. <strong>Error message:</strong> ' . $e->getMessage(), []));
+      }
     }
 
     // Validate if entering a valid machine name of queue.
