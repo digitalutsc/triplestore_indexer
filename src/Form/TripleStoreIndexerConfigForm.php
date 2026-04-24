@@ -65,9 +65,9 @@ class TripleStoreIndexerConfigForm extends ConfigFormBase {
       '#type' => 'select',
       '#title' => $this->t('Drupal Authentication (enabled if Access Control with Group is enabled)'),
       '#options' => [
-        '-1' => 'None',
-        'digest' => 'Basic Authentication',
-        'jwt' => 'JWT Authentication',
+        '-1' => $this->t('None'),
+        'digest' => $this->t('Basic Authentication'),
+        'jwt' => $this->t('JWT Authentication'),
       ],
       '#ajax' => [
         'wrapper' => 'questions-fieldset-wrapper',
@@ -105,7 +105,7 @@ class TripleStoreIndexerConfigForm extends ConfigFormBase {
             '#required' => TRUE,
             '#attributes' => [
               'value' => ($config->get('admin_password') !== NULL) ?
-              $config->get('admin_password') : "",
+                $config->get('admin_password') : "",
               'readonly' => ($config->get('admin_password') !== NULL) ? 'readonly' : FALSE,
             ],
             '#description' => $this->t('To reset the password, change Method of authentication to None first.'),
@@ -201,7 +201,7 @@ class TripleStoreIndexerConfigForm extends ConfigFormBase {
 
       if ($response->getStatusCode() !== 200) {
         $form_state->setErrorByName("server_url",
-          t('Your Server URL is not valid, please check it again.'));
+          $this->t('Your Server URL is not valid, please check it again.'));
       }
     }
     catch (\Exception $e) {
